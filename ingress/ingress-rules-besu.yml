@@ -1,4 +1,6 @@
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: besu-ingress-routes
   namespace: quorum
@@ -15,20 +17,20 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: besu-node-member-1
+                name: besu-node-rpc-1
                 port:
                   number: 8545
           - path: /ws
             pathType: Prefix
             backend:
               service:
-                name: besu-node-member-1
+                name: besu-node-rpc-1
                 port:
                   number: 8546
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: besu-monitoring-monitoring-grafana
+                name: quorum-monitoring-monitoring-grafana
                 port:
                   number: 3000
