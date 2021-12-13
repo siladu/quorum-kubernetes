@@ -49,7 +49,7 @@ az extension update --name aks-preview
 
 Create a resource group if you haven't got one ready for use.
 ```bash
-az group create --name besu-mc-dev --location "East US"
+az group create --name ExampleGroup --location "East US"
 ```
 
 
