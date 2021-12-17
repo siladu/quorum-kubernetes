@@ -2,7 +2,7 @@
 nodeFlags:
   bootnode: false
   generateKeys: false
-  privacy: true
+  privacy: false
   removeKeysOnDeletion: false
 
 provider: azure
