@@ -132,6 +132,22 @@ spec:
                 rm ./public${j}.key /tmp/enode${j}.key /opt/besu/key
               done
 
+              echo "Creating rpc keys ..."
+              for k in {1..2}
+              do
+                /opt/besu/bin/besu public-key export --to=public${k}.key
+                # the public key has an extra '0x' in front which isn't accepted by the enode format, this strips that out
+                sed 's/^0x//' ./public${k}.key > /tmp/enode${k}
+                echo "Creating rpc ${k} secrets in k8s ..."
+                ./kubectl create secret generic besu-node-rpc-${k}-keys --namespace {{ .Release.Namespace }} --from-file=private.key=/opt/besu/key --from-file=public.key=./public${k}.key --from-file=enode=/tmp/enode${k} --from-file=truststore.jks=/tls-secret/truststore.jks --from-file=jkspassword.txt=/tls-secret/jkspassword.txt --from-file=keystore.jks=/tls-secret/rpc-${k}.jks --from-file=rpc-${k}.pem=/tls-secret/rpc-${k}.pem
+
+                # add to the static-nodes
+                pubkey=$(cat /tmp/enode${j} )
+                echo ",\"enode://$pubkey@besu-node-rpc-$k-0.besu-node-rpc-$k.{{ .Release.Namespace }}.svc.cluster.local:30303?discport=0\"" >> /generated-config/static-nodes.json
+
+                rm ./public${k}.key /tmp/enode${k} /opt/besu/key
+              done
+
               echo "]" >> /generated-config/static-nodes.json
               # remove the extra comma to make it valid json
               sed -i '0,/,/s///' /generated-config/static-nodes.json
